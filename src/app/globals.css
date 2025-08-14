@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
-:root {
+[data-theme="light"], :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent-1: oklch(0.75 0.18 30);
+  --accent-2: oklch(0.7 0.19 140);
+  --accent-3: oklch(0.75 0.19 300);
 }
 
 @theme inline {
@@ -12,15 +15,111 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --accent-1: oklch(0.7 0.2 30);
+  --accent-2: oklch(0.75 0.2 140);
+  --accent-3: oklch(0.8 0.2 300);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* enkel typografi for innholdssider */
+.prose h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+}
+.prose p {
+  color: color(display-p3 0.65 0.65 0.65);
+}
+
+/* Moderne fargerik bakgrunn og glass-effekter */
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin-gradient {
+  to {
+    --angle: 360deg;
+  }
+}
+
+.bg-animated-gradient {
+  background: 
+    radial-gradient(1200px 800px at 10% -20%, color-mix(in oklab, var(--accent-3) 35%, transparent), transparent 60%),
+    radial-gradient(1000px 700px at 110% 10%, color-mix(in oklab, var(--accent-2) 35%, transparent), transparent 60%),
+    conic-gradient(from var(--angle), var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1));
+  filter: saturate(110%) contrast(105%);
+  animation: spin-gradient 30s linear infinite;
+  opacity: 0.35;
+}
+
+.grid-overlay {
+  mask-image: radial-gradient(300px 300px at 50% 50%, black 20%, transparent 70%);
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 10%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.25;
+}
+
+.glass {
+  background: color-mix(in oklab, var(--background) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--foreground) 12%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+}
+
+.text-gradient {
+  background-image: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-gradient {
+  background-image: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: oklch(0.98 0 0);
+}
+
+/* Scroll-drevne animasjoner */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  animation: fade-slide-up 0.6s ease-out forwards;
+  animation-timeline: view();
+  animation-range: entry 20% cover 20%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-animated-gradient {
+    animation: none;
+  }
+}
+
+/* Container queries for kortlayout */
+.card-grid {
+  container-type: inline-size;
+}
+
+@container (min-width: 640px) {
+  .episode-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+    align-items: center;
+  }
 }
